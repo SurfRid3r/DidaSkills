@@ -2,6 +2,101 @@
 
 本文档包含 TickTick/滴答清单常见场景的完整工作流示例。
 
+---
+
+## 工作流 0: 任务创建标准流程
+
+当用户需要创建任务时，遵循以下标准流程：
+
+### 步骤 1: 确定目标项目
+
+**情况 A: 用户明确指定了项目**
+```bash
+# 用户说"在工作项目添加任务"或"添加工作任务"
+# 直接尝试创建
+python ticktick.py tasks create --title "任务标题" --project-name "工作"
+```
+
+**情况 B: 用户未指定项目**
+```bash
+# 用户只说"添加一个买牛奶的任务"
+# 先列出项目让用户确认
+python ticktick.py projects list
+```
+
+**情况 C: 不确定项目名称时**
+```bash
+# 先列出所有可用项目
+python ticktick.py projects list
+
+# 输出示例:
+# 📁 📥 收集箱 (0 任务) [ID: inbox1022290574]
+# 📁 💼工作任务 (15 任务) [ID: 63946e00f7244412354e4c9c]
+# 📁 🚤定时任务 (5 任务) [ID: 671dbf3cd3c7bc0000000161]
+# 📁 📚 个人学习 (8 任务) [ID: 696cc835e4b0e5948ab76023]
+
+# 然后使用项目名称或 ID 创建任务
+python ticktick.py tasks create --title "任务标题" --project-name "工作任务"
+# 或使用 ID（更可靠）
+python ticktick.py tasks create --title "任务标题" --project-id "63946e00f7244412354e4c9c"
+```
+
+### 步骤 2: 创建任务
+
+```bash
+# 基本任务创建
+python ticktick.py tasks create --title "任务标题" --project-name "工作任务"
+
+# 带优先级和截止日期
+python ticktick.py tasks create \
+  --title "线上参与湘雅医院的汇报并更新进展" \
+  --project-name "工作任务" \
+  --priority high \
+  --due-date "2026-01-22T17:00:00+08:00"
+
+# 带标签
+python ticktick.py tasks create \
+  --title "季度总结" \
+  --project-name "工作" \
+  --tags "重要,紧急" \
+  --content "详细描述..."
+```
+
+### 错误处理
+
+**如果出现 "必须指定项目ID或项目名称" 错误**:
+```bash
+# 说明项目名称不正确，重新列出项目
+python ticktick.py projects list
+# 使用正确的项目名称或项目 ID
+```
+
+**如果出现认证错误**:
+```bash
+# 首次使用需要配置 .env
+cp .env.template .env
+# 编辑 .env 设置 DIDA_USERNAME 和 DIDA_PASSWORD
+```
+
+### 完整示例对话
+
+```
+用户: 这周四注意添加一个工作任务，线上参与湘雅医院的汇报
+
+Claude 执行流程:
+1. 用户提到了"工作任务"，直接尝试创建
+2. 计算日期：这周四 = 2026-01-22
+3. 执行命令:
+   python ticktick.py tasks create \
+     --title "线上参与湘雅医院的汇报并更新进展" \
+     --project-name "工作任务" \
+     --due-date "2026-01-22T17:00:00+08:00"
+4. 如果成功，返回任务 ID
+5. 如果项目名错误，运行 projects list 后重试
+```
+
+---
+
 ## 工作流 1: 每周计划
 
 ```bash
