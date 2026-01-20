@@ -14,9 +14,40 @@ from typing import Optional
 import httpx
 from dotenv import load_dotenv
 
-load_dotenv()
-
 logger = logging.getLogger(__name__)
+
+
+def get_config_dir() -> Path:
+    """Get the cross-platform configuration directory.
+
+    Returns:
+        Path to ~/.ticktick/ directory (created if not exists)
+    """
+    config_dir = Path.home() / ".ticktick"
+    config_dir.mkdir(parents=True, exist_ok=True)
+    return config_dir
+
+
+def get_env_file_path() -> Path:
+    """Get the path to the .env file.
+
+    Returns:
+        Path to ~/.ticktick/.env
+    """
+    return get_config_dir() / ".env"
+
+
+def get_token_file_path() -> Path:
+    """Get the path to the token file.
+
+    Returns:
+        Path to ~/.ticktick/token.json
+    """
+    return get_config_dir() / "token.json"
+
+
+# Load .env from config directory
+load_dotenv(get_env_file_path())
 
 
 class TokenManager:
@@ -26,14 +57,10 @@ class TokenManager:
         """Initialize token manager.
 
         Args:
-            token_path: Path to store token file. Defaults to .dida_token.json in project root
+            token_path: Path to store token file. Defaults to ~/.ticktick/token.json
         """
         if token_path is None:
-            # Default to .dida_token.json in project root (same directory as .env)
-            token_path = Path(os.getenv(
-                "DIDA_TOKEN_PATH",
-                Path.cwd() / ".dida_token.json"
-            ))
+            token_path = get_token_file_path()
         self.token_path = Path(token_path).expanduser()
         self.tokens = self._load_tokens()
 
@@ -118,7 +145,7 @@ class WebAuth:
             username: Email or phone number (defaults to DIDA_USERNAME env var)
             password: Account password (defaults to DIDA_PASSWORD env var)
             token_manager: Optional custom token manager
-            token_path: Optional path for token storage (defaults to ~/.dida/token.json)
+            token_path: Optional path for token storage (defaults to ~/.ticktick/token.json)
         """
         self.username = username or os.getenv("DIDA_USERNAME")
         self.password = password or os.getenv("DIDA_PASSWORD")
@@ -135,7 +162,13 @@ class WebAuth:
 
         if not self.username or not self.password:
             raise ValueError(
-                "DIDA_USERNAME and DIDA_PASSWORD must be set in environment or .env file"
+                f"未找到认证凭据。请按照以下步骤配置：\n"
+                f"1. 创建配置目录（如不存在）: mkdir -p {get_config_dir()}\n"
+                f"2. 创建 .env 文件: {get_env_file_path()}\n"
+                f"3. 设置以下内容：\n"
+                f"   DIDA_USERNAME=your_email@example.com\n"
+                f"   DIDA_PASSWORD=your_password\n"
+                f"4. 重新运行命令"
             )
 
     async def ensure_authenticated(self) -> None:

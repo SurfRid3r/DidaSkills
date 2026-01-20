@@ -47,9 +47,16 @@ python scripts/ticktick.py tasks create \
 
 **如果出现认证错误**:
 ```bash
-# 首次使用需要配置 .env
-cp .env.template .env
-# 编辑 .env 设置 DIDA_USERNAME 和 DIDA_PASSWORD
+# 首次使用需要配置 ~/.ticktick/.env
+# macOS/Linux:
+mkdir -p ~/.ticktick
+cp .env.template ~/.ticktick/.env
+nano ~/.ticktick/.env  # 编辑设置 DIDA_USERNAME 和 DIDA_PASSWORD
+
+# Windows:
+mkdir %USERPROFILE%\.ticktick
+copy .env.template %USERPROFILE%\.ticktick\.env
+notepad %USERPROFILE%\.ticktick\.env
 ```
 
 ### 完整示例对话

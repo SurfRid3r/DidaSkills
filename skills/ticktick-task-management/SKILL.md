@@ -20,9 +20,28 @@ TickTick/滴答清单统一 CLI 接口,所有命令通过 `python scripts/tickti
 ## 初始设置
 
 ```bash
+# 1. 安装依赖
 pip install -r requirements.txt
-cp .env.template .env
-# 编辑 .env: 设置 DIDA_USERNAME 和 DIDA_PASSWORD
+
+# 2. 创建配置目录（macOS/Linux）
+mkdir -p ~/.ticktick
+
+# 3. 复制并编辑 .env 文件
+cp .env.template ~/.ticktick/.env
+# 编辑 ~/.ticktick/.env 设置 DIDA_USERNAME 和 DIDA_PASSWORD
+```
+
+**Windows 用户**:
+```cmd
+REM 1. 安装依赖
+pip install -r requirements.txt
+
+REM 2. 创建配置目录
+mkdir %USERPROFILE%\.ticktick
+
+REM 3. 复制并编辑 .env 文件
+copy .env.template %USERPROFILE%\.ticktick\.env
+notepad %USERPROFILE%\.ticktick\.env
 ```
 
 ## 常用命令
@@ -86,7 +105,8 @@ python scripts/ticktick.py tasks batch-move --tasks '[{"taskId":"id1","projectId
 
 | 错误 | 解决方案 |
 |------|----------|
-| 认证失败 | 检查 `.env` 中的用户名密码 |
+| 认证失败 | 检查 `~/.ticktick/.env` 中的用户名密码 |
+| 未找到认证凭据 | 运行 `mkdir -p ~/.ticktick && cp .env.template ~/.ticktick/.env` 然后编辑 |
 | 任务未找到 | 使用 `search` 或 `completed` - 任务可能已完成 |
 | 无效的项目 ID | 使用 `projects list` 获取正确 ID |
 | SOCKS 代理错误 | 运行 `pip install httpx[socks]` |
